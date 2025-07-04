@@ -1,0 +1,14 @@
+/Library/
+/Logs/
+/Temp/
+*.csproj
+*.sln
+/Assets/TextMesh Pro/
+/Assets/TextMesh Pro.meta
+/obj
+/APK/
+/Test/
+/Assets/Free UI Click Sound Effects Pack/
+/Assets/Free UI Click Sound Effects Pack/
+/Keystore/
+/Assets/PEPK - info*
