@@ -1,24 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections;
+using General.Pooling;
 
 public class CannonProjectile : MonoBehaviour {
-	public float m_speed = 0.2f;
-	public int m_damage = 10;
+	[SerializeField] private float m_speed = 0.2f;
+	[SerializeField] private int m_damage = 10;
+
+	private Transform _transform; //Кэшируем трансформ, так как каждое обращение - это GetComponent
+	private Vector3 _cachedTranslation;	//То же самое с направлением
+
+	private void Awake() {
+		_transform = transform;
+		_cachedTranslation = _transform.forward * m_speed;
+	}
 
 	void Update () {
-		var translation = transform.forward * m_speed;
-		transform.Translate (translation);
+		_transform.Translate(_cachedTranslation * Time.deltaTime);	
 	}
 
 	void OnTriggerEnter(Collider other) {
-		var monster = other.gameObject.GetComponent<Monster> ();
-		if (monster == null)
-			return;
-
-		monster.m_hp -= m_damage;
-		if (monster.m_hp <= 0) {
-			Destroy (monster.gameObject);
+		if (other.TryGetComponent<Monster>(out Monster monster)) {
+			monster.ApplyDamage(m_damage);
+			ProjectilePool.Instance.ReturnToPool(this);
 		}
-		Destroy (gameObject);
+		
+		
+
+		
 	}
 }

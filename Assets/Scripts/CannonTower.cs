@@ -1,29 +1,52 @@
 ﻿using UnityEngine;
-using System.Collections;
+using General;
+using General.Pooling;
 
 public class CannonTower : MonoBehaviour {
-	public float m_shootInterval = 0.5f;
-	public float m_range = 4f;
-	public GameObject m_projectilePrefab;
-	public Transform m_shootPoint;
+	
+	[Header("Tower stats")]
+	
+	[SerializeField] private float m_shootInterval = 0.5f;
+	[SerializeField] private float m_range = 4f;
+	
+	[SerializeField] private Transform m_shootPoint;
+	
+	private float m_ShotTime = -0.5f;
+	private bool m_initialized;
 
-	private float m_lastShotTime = -0.5f;
+	private Vector3 m_towerPosition;
+	private float m_rangeSquared;
+	
+
+	private void Awake() {
+		if (ProjectilePool.Instance == null || m_shootPoint == null) {
+			Debug.Log("Проверьте пул объектов и/или точку выстрела");
+			return;
+		}
+
+		m_ShotTime = m_shootInterval;
+		m_towerPosition = transform.position;
+		m_rangeSquared = m_range * m_range;
+		m_initialized = true;
+	}
 
 	void Update () {
-		if (m_projectilePrefab == null || m_shootPoint == null)
+		if (m_initialized)
 			return;
 
-		foreach (var monster in FindObjectsOfType<Monster>()) {
-			if (Vector3.Distance (transform.position, monster.transform.position) > m_range)
-				continue;
+		if (m_ShotTime > 0) {
+			m_ShotTime -= Time.deltaTime;
+			return;
+		}
+		
 
-			if (m_lastShotTime + m_shootInterval > Time.time)
+		foreach (Monster monster in ActiveMonstersHorde.Instance.m_monsters) {
+			if (Vector3.SqrMagnitude (m_towerPosition - monster.transform.position) > m_rangeSquared)
 				continue;
 
 			// shot
-			Instantiate(m_projectilePrefab, m_shootPoint.position, m_shootPoint.rotation);
-
-			m_lastShotTime = Time.time;
+			ProjectilePool.Instance.GetAtPoint(m_shootPoint);
+			m_ShotTime = m_shootInterval;
 		}
 
 	}
