@@ -1,33 +1,32 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using General.Pooling;
+using UnityEngine;
 
-public class GuidedProjectile : MonoBehaviour {
-	public GameObject m_target;
-	public float m_speed = 0.2f;
-	public int m_damage = 10;
+public class GuidedProjectile : BaseProjectile {
+    public Transform m_target;
 
-	void Update () {
-		if (m_target == null) {
-			Destroy (gameObject);
-			return;
-		}
+    private Vector3 _cachedTranslation;
+    private float _speedSquared;
 
-		var translation = m_target.transform.position - transform.position;
-		if (translation.magnitude > m_speed) {
-			translation = translation.normalized * m_speed;
-		}
-		transform.Translate (translation);
-	}
+    private void OnEnable() {
+        _speedSquared = m_speed * m_speed;
+    }
 
-	void OnTriggerEnter(Collider other) {
-		var monster = other.gameObject.GetComponent<Monster> ();
-		if (monster == null)
-			return;
+    void Update() {
+        if (m_target == null) {
+            ReturnToPool();
+            return;
+        }
 
-		monster.m_hp -= m_damage;
-		if (monster.m_hp <= 0) {
-			Destroy (monster.gameObject);
-		}
-		Destroy (gameObject);
-	}
+        _cachedTranslation = m_target.position - Tf.position;
+        if (_cachedTranslation.sqrMagnitude > _speedSquared) {
+            _cachedTranslation = _cachedTranslation.normalized * m_speed;
+        }
+
+        Tf.Translate(_cachedTranslation);
+    }
+
+
+    protected override void ReturnToPool() {
+        GuidedProjectilePool.Instance.ReturnToPool(this);
+    }
 }

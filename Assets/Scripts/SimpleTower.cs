@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class SimpleTower : MonoBehaviour {
 	public float m_shootInterval = 0.5f;
@@ -22,7 +21,7 @@ public class SimpleTower : MonoBehaviour {
 			// shot
 			var projectile = Instantiate(m_projectilePrefab, transform.position + Vector3.up * 1.5f, Quaternion.identity) as GameObject;
 			var projectileBeh = projectile.GetComponent<GuidedProjectile> ();
-			projectileBeh.m_target = monster.gameObject;
+			projectileBeh.m_target = monster.Tf;
 
 			m_lastShotTime = Time.time;
 		}

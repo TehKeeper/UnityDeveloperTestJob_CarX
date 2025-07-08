@@ -63,8 +63,6 @@ namespace General.Pooling {
 
     [Serializable]
     public class CapsuleObjectMaker<T> : IObjectMaker<T> where T : UnityEngine.Component {
-        [SerializeField] private T m_prefab;
-
         public T Make() {
             GameObject newItem = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             Rigidbody itemRigidBody = newItem.AddComponent<Rigidbody>();

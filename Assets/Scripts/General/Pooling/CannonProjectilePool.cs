@@ -2,7 +2,17 @@
 using UnityEngine.Pool;
 
 namespace General.Pooling {
-    public class CannonProjectilePool : ObjectPoolGeneric<CannonProjectile> {
+    public abstract class ProjectilePoolBase<T> : ObjectPoolGeneric<T> where T: BaseProjectile {
+        protected override void EnableItem(T item) {
+            item.Go.SetActive(true);
+        }
+        
+        protected override void DisableItem(T item) {
+            item.Go.SetActive(false);
+        }
+    }
+
+    public class CannonProjectilePool : ProjectilePoolBase<CannonProjectile> {
         public static CannonProjectilePool Instance;
 
         [SerializeField] private PrefabObjectMaker<CannonProjectile> _prefabMaker;
@@ -18,12 +28,6 @@ namespace General.Pooling {
             DontDestroyOnLoad(gameObject);
         }
 
-        protected override void EnableItem(CannonProjectile item) {
-            item.gameObject.SetActive(true);
-        }
-
-        protected override void DisableItem(CannonProjectile item) {
-            item.gameObject.SetActive(false);
-        }
+        
     }
 }
