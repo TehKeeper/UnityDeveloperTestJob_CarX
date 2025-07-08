@@ -2,6 +2,10 @@
     public class MonsterPool : ObjectPoolGeneric<Monster> {
         public static MonsterPool Instance;
 
+        protected override IObjectMaker<Monster> ObjectMaker => _monsterMaker;
+
+        private CapsuleObjectMaker<Monster> _monsterMaker = new ();
+
         protected override void Intialize() {
             if (Instance != null) {
                 Destroy(gameObject);
@@ -18,6 +22,7 @@
 
         protected override void DisableItem(Monster item) {
             item.gameObject.SetActive(false);
+            ActiveMonstersHorde.Instance.TryRemove(item);
         }
     }
 }

@@ -24,8 +24,5 @@ public class CannonProjectile : MonoBehaviour {
 			ProjectilePool.Instance.ReturnToPool(this);
 		}
 		
-		
-
-		
 	}
 }

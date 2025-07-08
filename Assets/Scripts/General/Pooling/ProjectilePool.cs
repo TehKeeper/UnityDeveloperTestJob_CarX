@@ -5,6 +5,10 @@ namespace General.Pooling {
     public class ProjectilePool : ObjectPoolGeneric<CannonProjectile> {
         public static ProjectilePool Instance;
 
+        [SerializeField] private PrefabObjectMaker<CannonProjectile> _prefabMaker;
+
+        protected override IObjectMaker<CannonProjectile> ObjectMaker => _prefabMaker;
+
         protected override void Intialize() {
             if (Instance != null) {
                 Destroy(gameObject);

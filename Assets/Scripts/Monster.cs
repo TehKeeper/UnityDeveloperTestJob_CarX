@@ -2,11 +2,12 @@
 using UnityEngine;
 using System.Collections;
 using General;
+using General.Pooling;
 using UnityEditor;
 
 public class Monster : MonoBehaviour {
 
-	public GameObject m_moveTarget;
+	public Transform m_moveTarget;
 	public float m_speed = 0.1f;
 	public int m_maxHP = 30;
 	const float m_reachDistance = 0.3f;
@@ -27,12 +28,12 @@ public class Monster : MonoBehaviour {
 		if (m_moveTarget == null)
 			return;
 		
-		if (Vector3.Distance (_transform.position, m_moveTarget.transform.position) <= m_reachDistance) {
+		if (Vector3.Distance (_transform.position, m_moveTarget.position) <= m_reachDistance) {
 			Destroy (gameObject);
 			return;
 		}
 
-		var translation = m_moveTarget.transform.position - _transform.position;
+		var translation = m_moveTarget.position - _transform.position;
 		if (translation.magnitude > m_speed) {
 			translation = translation.normalized * m_speed;
 		}
@@ -42,9 +43,8 @@ public class Monster : MonoBehaviour {
 	public void ApplyDamage(int mDamage) {
 		m_hp -= mDamage;
 		if (m_hp <= 0) {
-			ActiveMonstersHorde.Instance.Remove(this);
-			Destroy(gameObject);   // todo return to pool
-			
+			MonsterPool.Instance.ReturnToPool(this);
+
 		}
 	}
 }

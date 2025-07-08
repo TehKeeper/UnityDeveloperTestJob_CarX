@@ -13,16 +13,17 @@ namespace General {
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            
+
             Monsters = new List<Monster>();
         }
 
-       public void Add(Monster monster) {
-           Monsters.Add(monster);
-       }
+        public void Add(Monster monster) {
+            Monsters.Add(monster);
+        }
 
-       public void Remove(Monster monster) {
-           Monsters.Remove(monster);
-       }
+        public void TryRemove(Monster monster) {
+            if (Monsters.Contains(monster))
+                Monsters.Remove(monster);
+        }
     }
 }
