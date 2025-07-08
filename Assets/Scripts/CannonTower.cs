@@ -11,11 +11,11 @@ public class CannonTower : MonoBehaviour {
 	
 	[SerializeField] private Transform m_shootPoint;
 	
-	private float m_ShotTime = -0.5f;
-	private bool m_initialized;
+	private float _shotTime;
+	private bool _initialized;
 
-	private Vector3 m_towerPosition;
-	private float m_rangeSquared;
+	private Vector3 _towerPosition;
+	private float _rangeSquared;
 	
 
 	private void Awake() {
@@ -24,29 +24,29 @@ public class CannonTower : MonoBehaviour {
 			return;
 		}
 
-		m_ShotTime = m_shootInterval;
-		m_towerPosition = transform.position;
-		m_rangeSquared = m_range * m_range;
-		m_initialized = true;
+		_shotTime = m_shootInterval;
+		_towerPosition = transform.position;
+		_rangeSquared = m_range * m_range;
+		_initialized = true;
 	}
 
 	void Update () {
-		if (m_initialized)
+		if (_initialized)
 			return;
 
-		if (m_ShotTime > 0) {
-			m_ShotTime -= Time.deltaTime;
+		if (_shotTime > 0) {
+			_shotTime -= Time.deltaTime;
 			return;
 		}
 		
 
-		foreach (Monster monster in ActiveMonstersHorde.Instance.m_monsters) {
-			if (Vector3.SqrMagnitude (m_towerPosition - monster.transform.position) > m_rangeSquared)
+		foreach (Monster monster in ActiveMonstersHorde.Instance.Monsters) {
+			if (Vector3.SqrMagnitude (_towerPosition - monster.transform.position) > _rangeSquared)
 				continue;
 
 			// shot
 			ProjectilePool.Instance.GetAtPoint(m_shootPoint);
-			m_ShotTime = m_shootInterval;
+			_shotTime = m_shootInterval;
 		}
 
 	}

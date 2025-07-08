@@ -4,23 +4,25 @@ using UnityEngine;
 namespace General {
     public class ActiveMonstersHorde : MonoBehaviour {
         public static ActiveMonstersHorde Instance;
-        public List<Monster> m_monsters = new List<Monster>();
+        public List<Monster> Monsters { get; private set; }
 
-       private void Awake() {
+        private void Awake() {
             if (Instance != null) {
                 Destroy(gameObject);
             }
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            Monsters = new List<Monster>();
         }
 
        public void Add(Monster monster) {
-           m_monsters.Add(monster);
+           Monsters.Add(monster);
        }
 
        public void Remove(Monster monster) {
-           m_monsters.Remove(monster);
+           Monsters.Remove(monster);
        }
     }
 }
