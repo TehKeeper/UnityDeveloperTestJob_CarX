@@ -35,7 +35,7 @@ namespace General.Pooling {
             return _cachedObject;
         }
 
-        protected abstract void EnableItem(T cachedObject);
+        protected abstract void EnableItem(T item);
 
         public void ReturnToPool(T item) {
             DisableItem(item);
