@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 using General.Pooling;
 
 public class Spawner : MonoBehaviour {
@@ -10,9 +8,11 @@ public class Spawner : MonoBehaviour {
 	private float m_lastSpawn = 3;
 	private Transform _transform;
 
+	private Monster _cachedMonster;
+
 	private void Awake() {
 		_transform = transform;
-		m_lastSpawn = m_interval;
+		m_lastSpawn = 0;
 	}
 
 	void Update () {
@@ -21,15 +21,9 @@ public class Spawner : MonoBehaviour {
 			return;
 		}
 		
-		Monster monster = MonsterPool.Instance.GetAtPoint(_transform);
-			
-		monster.m_moveTarget = m_moveTarget;
+		_cachedMonster = MonsterPool.Instance.GetAtPoint(_transform);
+		_cachedMonster.SetTargetPosition(m_moveTarget.position);
 
 		m_lastSpawn = m_interval;
-		
-		
-		if (Time.time > m_lastSpawn + m_interval) {
-			
-		}
 	}
 }

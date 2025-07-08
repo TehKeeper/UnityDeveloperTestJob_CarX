@@ -11,7 +11,7 @@ public class CannonTower : MonoBehaviour {
 	
 	[SerializeField] private Transform m_shootPoint;
 	
-	private float _shotTime;
+	[SerializeField] private float _shotTime;
 	private bool _initialized;
 
 	private Vector3 _towerPosition;
@@ -19,7 +19,7 @@ public class CannonTower : MonoBehaviour {
 	
 
 	private void Awake() {
-		if (ProjectilePool.Instance == null || m_shootPoint == null) {
+		if (CannonProjectilePool.Instance == null || m_shootPoint == null) {
 			Debug.Log("Проверьте пул объектов и/или точку выстрела");
 			return;
 		}
@@ -31,7 +31,7 @@ public class CannonTower : MonoBehaviour {
 	}
 
 	void Update () {
-		if (_initialized)
+		if (!_initialized)
 			return;
 
 		if (_shotTime > 0) {
@@ -45,7 +45,7 @@ public class CannonTower : MonoBehaviour {
 				continue;
 
 			// shot
-			ProjectilePool.Instance.GetAtPoint(m_shootPoint);
+			CannonProjectilePool.Instance.GetAtPoint(m_shootPoint);
 			_shotTime = m_shootInterval;
 		}
 

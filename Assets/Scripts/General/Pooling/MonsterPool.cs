@@ -1,4 +1,6 @@
-﻿namespace General.Pooling {
+﻿using UnityEngine;
+
+namespace General.Pooling {
     public class MonsterPool : ObjectPoolGeneric<Monster> {
         public static MonsterPool Instance;
 
@@ -16,13 +18,17 @@
         }
 
         protected override void EnableItem(Monster item) {
-            item.gameObject.SetActive(true);
+            item.Go.SetActive(true);
+            item.Tf.parent = null;
             ActiveMonstersHorde.Instance.Add(item);
         }
 
         protected override void DisableItem(Monster item) {
-            item.gameObject.SetActive(false);
+            item.Go.SetActive(false);
             ActiveMonstersHorde.Instance.TryRemove(item);
+
+            item.Tf.position = PhysicalStorage.position;
+            item.Tf.parent = PhysicalStorage;
         }
     }
 }

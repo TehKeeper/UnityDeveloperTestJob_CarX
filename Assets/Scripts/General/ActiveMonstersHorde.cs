@@ -22,8 +22,10 @@ namespace General {
         }
 
         public void TryRemove(Monster monster) {
-            if (Monsters.Contains(monster))
+            if (Monsters.Contains(monster)) {
                 Monsters.Remove(monster);
+                Debug.Log("Monster Removed");
+            }
         }
     }
 }

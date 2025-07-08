@@ -1,50 +1,60 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 using General;
 using General.Pooling;
-using UnityEditor;
 
 public class Monster : MonoBehaviour {
+    public float m_speed = 0.1f;
+    public int m_maxHP = 30;
+    const float m_reachDistance = 0.5477f;
 
-	public Transform m_moveTarget;
-	public float m_speed = 0.1f;
-	public int m_maxHP = 30;
-	const float m_reachDistance = 0.3f;
+    public int m_hp;
 
-	public int m_hp;
-	private Transform _transform;
+    private float _reachDistanceSquared;
 
-	private void Awake() {
-		_transform = transform;
-	}
+    private Vector3 m_moveTarget;
+    private Vector3 _translation;
 
-	void OnEnable() {
-		m_hp = m_maxHP;
-		ActiveMonstersHorde.Instance.Add(this);
-	}
+    /// <summary> gameObject </summary>
+    /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
+    public GameObject Go { get; private set; }
+    
+    /// <summary> transform </summary>
+    /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
+    public Transform Tf { get; private set; }
 
-	void Update () {
-		if (m_moveTarget == null)
-			return;
-		
-		if (Vector3.Distance (_transform.position, m_moveTarget.position) <= m_reachDistance) {
-			Destroy (gameObject);
-			return;
-		}
+    private void Awake() {
+        Tf = transform;
+        Go = gameObject;
+        _reachDistanceSquared = m_reachDistance * m_reachDistance;
+    }
 
-		var translation = m_moveTarget.position - _transform.position;
-		if (translation.magnitude > m_speed) {
-			translation = translation.normalized * m_speed;
-		}
-		_transform.Translate (translation);
-	}
+    void OnEnable() {
+        m_hp = m_maxHP;
+        ActiveMonstersHorde.Instance.Add(this);
+    }
 
-	public void ApplyDamage(int mDamage) {
-		m_hp -= mDamage;
-		if (m_hp <= 0) {
-			MonsterPool.Instance.ReturnToPool(this);
+    void Update() {
+        /*if (m_moveTarget == null)
+            return;*/
 
-		}
-	}
+        Debug.Log($"Monster to endpoint: {(Tf.position - m_moveTarget).sqrMagnitude}");
+        if ((Tf.position - m_moveTarget).sqrMagnitude <= _reachDistanceSquared) {
+            MonsterPool.Instance.ReturnToPool(this);
+            return;
+        }
+
+        Tf.Translate(_translation);
+    }
+
+    public void ApplyDamage(int mDamage) {
+        m_hp -= mDamage;
+        if (m_hp <= 0) {
+            MonsterPool.Instance.ReturnToPool(this);
+        }
+    }
+
+    public void SetTargetPosition(Vector3 target) {
+        m_moveTarget = target;
+        _translation = (m_moveTarget - Tf.position).normalized * m_speed;
+    }
 }

@@ -2,8 +2,8 @@
 using UnityEngine.Pool;
 
 namespace General.Pooling {
-    public class ProjectilePool : ObjectPoolGeneric<CannonProjectile> {
-        public static ProjectilePool Instance;
+    public class CannonProjectilePool : ObjectPoolGeneric<CannonProjectile> {
+        public static CannonProjectilePool Instance;
 
         [SerializeField] private PrefabObjectMaker<CannonProjectile> _prefabMaker;
 

@@ -5,9 +5,7 @@ using UnityEngine.Pool;
 
 namespace General.Pooling {
     public abstract class ObjectPoolGeneric<T> : MonoBehaviour where T : UnityEngine.Component {
-        [SerializeField] private Transform _physicalStorage;
-
-        [SerializeField] private T _prefab;
+        [SerializeField] protected Transform PhysicalStorage;
 
         private Queue<T> _queue = new();
         private T _cachedObject;
@@ -16,8 +14,8 @@ namespace General.Pooling {
         protected abstract IObjectMaker<T> ObjectMaker { get; }
 
         private void Awake() {
-            if (_physicalStorage == null) {
-                _physicalStorage = transform;
+            if (PhysicalStorage == null) {
+                PhysicalStorage = transform;
             }
 
             Intialize();
