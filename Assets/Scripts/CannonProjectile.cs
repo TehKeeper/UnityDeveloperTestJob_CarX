@@ -8,12 +8,13 @@ public class CannonProjectile : BaseProjectile {
 	private Vector3 _defPos;
 
 	public void SetTranslation(Vector3 forward) {
-		_cachedTranslation = forward * m_speed;
+		_cachedTranslation = forward ;
 		_defPos = Tf.position;
 	}
 
 	void Update () {
-		Tf.Translate(_cachedTranslation * Time.deltaTime);	
+		//Tf.position += _cachedTranslation * m_speed * Time.deltaTime;
+		Tf.Translate(_cachedTranslation * m_speed * Time.deltaTime, Space.World);	
 		Debug.DrawLine(_defPos, _defPos+_cachedTranslation*100, Color.blue);
 		Debug.DrawLine(_defPos, Tf.position, Color.green);
 	}

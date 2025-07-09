@@ -66,7 +66,7 @@ namespace Towers {
 
             Debug.DrawLine(targetPos, barrelPosition, Color.red);
             interception = targetPos + targetVelocity * _resultTime;
-            Debug.Break();
+
             return true;
         }
     }
