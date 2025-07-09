@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿using General.Pooling;
+using UnityEngine;
 
 public class SimpleTower : MonoBehaviour {
+	[SerializeField] private Transform m_barrel;
+	
 	public float m_shootInterval = 0.5f;
 	public float m_range = 4f;
 	public GameObject m_projectilePrefab;
@@ -19,9 +22,10 @@ public class SimpleTower : MonoBehaviour {
 				continue;
 
 			// shot
-			var projectile = Instantiate(m_projectilePrefab, transform.position + Vector3.up * 1.5f, Quaternion.identity) as GameObject;
-			var projectileBeh = projectile.GetComponent<GuidedProjectile> ();
+			//var projectile = Instantiate(m_projectilePrefab, transform.position + Vector3.up * 1.5f, Quaternion.identity) as GameObject;
+			GuidedProjectile projectileBeh = GuidedProjectilePool.Instance.GetAtPoint(m_barrel);
 			projectileBeh.m_target = monster.Tf;
+			projectileBeh.CalculateVector(m_barrel.position, monster.Tf.position, monster.GetVelocity());
 
 			m_lastShotTime = Time.time;
 		}

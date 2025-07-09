@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using General;
 using General.Pooling;
 
 public class Monster : MonoBehaviour {
-    public float m_speed = 0.1f;
-    public int m_maxHP = 30;
+    public float m_speed = 2f;
+    public int m_maxHP = 1;
     const float m_reachDistance = 0.5477f;
 
     public int m_hp;
@@ -17,7 +18,7 @@ public class Monster : MonoBehaviour {
     /// <summary> gameObject </summary>
     /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
     public GameObject Go { get; private set; }
-    
+
     /// <summary> transform </summary>
     /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
     public Transform Tf { get; private set; }
@@ -37,13 +38,13 @@ public class Monster : MonoBehaviour {
         /*if (m_moveTarget == null)
             return;*/
 
-        Debug.Log($"Monster to endpoint: {(Tf.position - m_moveTarget).sqrMagnitude}");
+        
         if ((Tf.position - m_moveTarget).sqrMagnitude <= _reachDistanceSquared) {
             MonsterPool.Instance.ReturnToPool(this);
             return;
         }
 
-        Tf.Translate(_translation);
+        Tf.Translate(_translation*Time.deltaTime);
     }
 
     public void ApplyDamage(int mDamage) {
@@ -56,5 +57,12 @@ public class Monster : MonoBehaviour {
     public void SetTargetPosition(Vector3 target) {
         m_moveTarget = target;
         _translation = (m_moveTarget - Tf.position).normalized * m_speed;
+    }
+
+    public Vector3 GetVelocity() => _translation * m_speed;
+
+    private void OnDrawGizmos() {
+        Gizmos.color = new Color(0.9f, 0.4f, 0.0f, 0.5f);
+        Gizmos.DrawSphere(Tf.position, 0.2f);
     }
 }
