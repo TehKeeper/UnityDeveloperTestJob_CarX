@@ -55,6 +55,8 @@ namespace General.Pooling {
     [Serializable]
     public class PrefabObjectMaker<T> : IObjectMaker<T> where T : UnityEngine.Component {
         [SerializeField] private T m_prefab;
+        public T Prefab => m_prefab;
+
         public T Make() => UnityEngine.GameObject.Instantiate(m_prefab);
 
         public T MakeAtPoint(Transform point) =>
@@ -79,4 +81,6 @@ namespace General.Pooling {
             return item;
         }
     }
+
+    
 }

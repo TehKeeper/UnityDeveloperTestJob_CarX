@@ -14,5 +14,7 @@ namespace General.Pooling {
             DontDestroyOnLoad(gameObject);
         }
         
+        public override float GetProjectileSpeed() => _prefabMaker.Prefab.Speed;
+        
     }
 }

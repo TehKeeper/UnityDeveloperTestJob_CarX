@@ -5,7 +5,7 @@ using General.Pooling;
 
 public class Monster : MonoBehaviour {
     public float m_speed = 2f;
-    public int m_maxHP = 1;
+    public int m_maxHP = 30;
     const float m_reachDistance = 0.5477f;
 
     public int m_hp;

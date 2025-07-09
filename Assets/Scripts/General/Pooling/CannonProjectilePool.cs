@@ -1,17 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.Pool;
 
 namespace General.Pooling {
-    public abstract class ProjectilePoolBase<T> : ObjectPoolGeneric<T> where T: BaseProjectile {
-        protected override void EnableItem(T item) {
-            item.Go.SetActive(true);
-        }
-        
-        protected override void DisableItem(T item) {
-            item.Go.SetActive(false);
-        }
-    }
-
     public class CannonProjectilePool : ProjectilePoolBase<CannonProjectile> {
         public static CannonProjectilePool Instance;
 
@@ -27,7 +16,7 @@ namespace General.Pooling {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-
         
+        public override float GetProjectileSpeed() => _prefabMaker.Prefab.Speed;
     }
 }
