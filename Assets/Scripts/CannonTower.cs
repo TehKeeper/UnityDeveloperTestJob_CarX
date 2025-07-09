@@ -3,6 +3,7 @@ using UnityEngine;
 using General;
 using General.Pooling;
 using Towers;
+using UnityEngine.Serialization;
 
 public class CannonTower : MonoBehaviour {
     [Header("Tower stats")]
@@ -14,8 +15,11 @@ public class CannonTower : MonoBehaviour {
 
     [SerializeField] private float _shotTime;
 
+    [FormerlySerializedAs("_turret")]
     [Header("Turret Parts")]
-    [SerializeField] private CannonTurret _turret;
+    [SerializeField] private CannonTurret _turretHor;
+
+    [SerializeField] private CannonTurret _turretVert;
 
 
     private bool _initialized;
@@ -48,25 +52,34 @@ public class CannonTower : MonoBehaviour {
         if (!_initialized)
             return;
 
-        if (!_targetLocked || (_towerPosition - _interception).sqrMagnitude > _rangeSquared)
+        if (!_targetLocked || _target.IsDead || (_towerPosition - _interception).sqrMagnitude > _rangeSquared)
             FindTarget();
 
         if (!_targetLocked)
             return;
 
         if (PreemptiveCalculator.TryCalculateInterception(m_shootPoint.position, _projectileSpeed,
-                _target.Tf.position, _target.GetVelocity(), out _interception)) {
-            _turret.Rotate(_target.Tf.position, RotationAxis.Y);
+                _target.Tf.position, _target.GetVelocity(), out _interception, out float time)) {
+            _turretHor.RotateToTarget(_target.Tf.position, RotationAxis.Y);
 
-            if (_shotTime > 0) {
-                _shotTime -= Time.deltaTime;
-                return;
-            }
 
-            if (Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized) < 0.95f) {
-                _cachedProjectile = CannonProjectilePool.Instance.GetAtPoint(m_shootPoint);
-                _cachedProjectile.SetTranslation((_interception - m_shootPoint.position).normalized);
-                _shotTime = m_shootInterval;
+            if (PreemptiveCalculator.CalculateParabolicVelocity(m_shootPoint.position, _interception, time*2f,
+                    out Vector3 velocity, false)) {
+                _turretVert.RotateToDirection(velocity, RotationAxis.X);
+
+                if (_shotTime > 0) {
+                    _shotTime -= Time.deltaTime;
+                    return;
+                }
+
+                /*if (Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized) < 0.95f)*/ {
+                    _cachedProjectile = CannonProjectilePool.Instance.GetAtPoint(m_shootPoint);
+                    //_cachedProjectile.SetTranslation((_interception - m_shootPoint.position).normalized);
+
+                    _cachedProjectile.Launch(velocity);
+
+                    _shotTime = m_shootInterval;
+                }
             }
         }
     }
@@ -74,8 +87,9 @@ public class CannonTower : MonoBehaviour {
     private void FindTarget() {
         _sqrMagnitude = 0;
         _closest = float.MaxValue;
+        _targetLocked = false;
         foreach (Monster monster in ActiveMonstersHorde.Instance.Monsters) {
-            if (!monster.Go.activeSelf /* || monster.IsDead*/)
+            if (monster.IsDead)
                 continue;
 
             _sqrMagnitude = (_towerPosition - monster.transform.position).sqrMagnitude;
@@ -104,12 +118,16 @@ public class CannonTurret {
     [SerializeField] float _rotationSpeed = 1;
 
 
-    public void Rotate(Vector3 targetPosition, RotationAxis constrainedAxis) {
+    public void RotateToTarget(Vector3 targetPosition, RotationAxis constrainedAxis) {
         if (!_pivot)
             return;
 
         Vector3 direction = (targetPosition - _pivot.position).normalized;
 
+        RotateToDirection(direction, constrainedAxis);
+    }
+
+    public void RotateToDirection(Vector3 direction, RotationAxis constrainedAxis) {
         Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
 
         Vector3 targetEuler = targetRotation.eulerAngles;

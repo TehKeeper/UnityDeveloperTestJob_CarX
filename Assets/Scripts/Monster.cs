@@ -53,9 +53,10 @@ public class Monster : MonoBehaviour {
 
     private void DisableMonster() {
         IsDead = true;
+        
+        MonsterPool.Instance.ReturnToPool(this);
         OnTargetDestroyed?.Invoke();
         OnTargetDestroyed = null;
-        MonsterPool.Instance.ReturnToPool(this);
     }
 
     public void ApplyDamage(int mDamage) {

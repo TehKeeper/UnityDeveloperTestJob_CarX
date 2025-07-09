@@ -1,27 +1,44 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using General.Pooling;
+using Towers;
 
 public class CannonProjectile : BaseProjectile {
+    private Vector3 _cachedTranslation;
 
-	private Vector3 _cachedTranslation;	//То же самое с направлением
-	private Vector3 _defPos;
+    private Rigidbody _rb;
 
-	public void SetTranslation(Vector3 forward) {
-		_cachedTranslation = forward ;
-		_defPos = Tf.position;
-	}
+    private List<Vector3> _track = new();
 
-	void Update () {
-		//Tf.position += _cachedTranslation * m_speed * Time.deltaTime;
-		Tf.Translate(_cachedTranslation * m_speed * Time.deltaTime, Space.World);	
-		Debug.DrawLine(_defPos, _defPos+_cachedTranslation*100, Color.blue);
-		Debug.DrawLine(_defPos, Tf.position, Color.green);
-	}
+    public void SetTranslation(Vector3 forward) {
+        _cachedTranslation = forward;
+    }
 
-	protected override void ReturnToPool() {
-		CannonProjectilePool.Instance.ReturnToPool(this);
-	}
+    protected override void Initialize() {
+        _rb = Go.GetComponent<Rigidbody>();
+        _track.Clear();
+    }
 
-	
+    public void Launch(Vector3 velocity) {
+        _rb.AddForce(velocity, ForceMode.Impulse);
+    }
+
+    void Update() {
+        _track.Add(Tf.position);
+        if (_track.Count > 1)
+            for (int i = 0; i < _track.Count - 1; i++) {
+                Debug.DrawLine(_track[i], _track[i + 1], Color.green);
+            }
+        //Tf.position += _cachedTranslation * m_speed * Time.deltaTime;
+
+        return;
+        Tf.Translate(_cachedTranslation * m_speed * Time.deltaTime, Space.World);
+    }
+
+    protected override void ReturnToPool() {
+        _track.Clear();
+        _rb.Sleep();
+        CannonProjectilePool.Instance.ReturnToPool(this);
+    }
 }
