@@ -27,6 +27,7 @@ public class CannonTower : MonoBehaviour {
     private CannonProjectile _cachedProjectile;
     private Monster _target;
     private bool _targetLocked;
+    private float _closest = float.PositiveInfinity;
 
 
     private void Awake() {
@@ -48,9 +49,10 @@ public class CannonTower : MonoBehaviour {
 
         if (!_targetLocked || !_target || (_towerPosition - _target.Tf.position).sqrMagnitude > _rangeSquared)
             FindTarget();
-        else {
+        /*else {
             _targetLocked = false;
-        }
+            Debug.Log("target unlocked");
+        }*/
 
         if (!_targetLocked)
             return;
@@ -64,42 +66,28 @@ public class CannonTower : MonoBehaviour {
                 return;
             }
 
-            Debug.Log($"Le Dot: {Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized)}");
+            Debug.Log(
+                $"Le Dot: {Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized)}");
 
-            Debug.DrawLine(_interception , m_shootPoint.position, Color.magenta);
-            _cachedProjectile = CannonProjectilePool.Instance.GetAtPoint(m_shootPoint);
-            _cachedProjectile.SetTranslation((_interception - m_shootPoint.position).normalized);
-            _shotTime = m_shootInterval;
-        }
-
-
-        /*foreach (Monster monster in ActiveMonstersHorde.Instance.Monsters) {
-            if (Vector3.SqrMagnitude(_towerPosition - monster.transform.position) > _rangeSquared)
-                continue;
-
-
-            if (PreemptiveCalculator.TryCalculateInterception(m_shootPoint.position, _projectileSpeed,
-                    monster.Tf.position, monster.GetVelocity(), out _interception)) {
-                _turret.Rotate(monster.Tf.position, RotationAxis.Y);
-
-                /*_cachedProjectile = CannonProjectilePool.Instance.GetAtPoint(m_shootPoint);
+            if (Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized) < 0.9f) {
+                _cachedProjectile = CannonProjectilePool.Instance.GetAtPoint(m_shootPoint);
                 _cachedProjectile.SetTranslation((_interception - m_shootPoint.position).normalized);
-                _shotTime = m_shootInterval;#1#
+                _shotTime = m_shootInterval;
             }
-
-            break;
-        }*/
+        }
     }
 
     private void FindTarget() {
         foreach (Monster monster in ActiveMonstersHorde.Instance.Monsters) {
-            if (Vector3.SqrMagnitude(_towerPosition - monster.transform.position) < _rangeSquared)
+            float sqrMagnitude = Vector3.SqrMagnitude(_towerPosition - monster.transform.position);
+            if (sqrMagnitude < _rangeSquared)
                 continue;
 
-            _target = monster;
-            _targetLocked = true;
-
-            break;
+            if(_closest>sqrMagnitude) {
+                _target = monster;
+                _targetLocked = true;
+                _closest = sqrMagnitude;
+            }
         }
     }
 }
