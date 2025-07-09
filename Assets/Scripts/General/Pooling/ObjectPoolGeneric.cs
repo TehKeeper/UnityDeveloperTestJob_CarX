@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace General.Pooling {
     public abstract class ObjectPoolGeneric<T> : MonoBehaviour where T : UnityEngine.Component {
@@ -65,8 +64,10 @@ namespace General.Pooling {
 
     [Serializable]
     public class CapsuleObjectMaker<T> : IObjectMaker<T> where T : UnityEngine.Component {
+        private int _index = 0;
         public T Make() {
             GameObject newItem = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            newItem.name = $"{newItem.name}_{_index++}";
             Rigidbody itemRigidBody = newItem.AddComponent<Rigidbody>();
             itemRigidBody.useGravity = false;
             T componenet = newItem.AddComponent<T>();

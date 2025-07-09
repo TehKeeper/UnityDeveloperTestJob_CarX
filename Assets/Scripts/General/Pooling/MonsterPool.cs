@@ -14,13 +14,12 @@ namespace General.Pooling {
             }
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
 
         protected override void EnableItem(Monster item) {
             item.Go.SetActive(true);
             item.Tf.parent = null;
-            ActiveMonstersHorde.Instance.Add(item);
+            
         }
 
         protected override void DisableItem(Monster item) {

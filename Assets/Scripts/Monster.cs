@@ -6,7 +6,7 @@ using General.Pooling;
 public class Monster : MonoBehaviour {
     public float m_speed = 2f;
     public int m_maxHP = 30;
-    const float m_reachDistance = 0.5477f;
+    public event Action OnTargetDestroyed;
 
     public int m_hp;
 
@@ -14,6 +14,9 @@ public class Monster : MonoBehaviour {
 
     private Vector3 m_moveTarget;
     private Vector3 _translation;
+
+    private const float m_reachDistance = 0.5477f;
+    public bool IsDead { get; private set; }
 
     /// <summary> gameObject </summary>
     /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
@@ -30,6 +33,7 @@ public class Monster : MonoBehaviour {
     }
 
     void OnEnable() {
+        IsDead = false;
         m_hp = m_maxHP;
         ActiveMonstersHorde.Instance.Add(this);
     }
@@ -38,19 +42,26 @@ public class Monster : MonoBehaviour {
         /*if (m_moveTarget == null)
             return;*/
 
-        
+
         if ((Tf.position - m_moveTarget).sqrMagnitude <= _reachDistanceSquared) {
-            MonsterPool.Instance.ReturnToPool(this);
+            DisableMonster();
             return;
         }
 
-        Tf.Translate(_translation*Time.deltaTime);
+        Tf.Translate(_translation * Time.deltaTime);
+    }
+
+    private void DisableMonster() {
+        IsDead = true;
+        OnTargetDestroyed?.Invoke();
+        OnTargetDestroyed = null;
+        MonsterPool.Instance.ReturnToPool(this);
     }
 
     public void ApplyDamage(int mDamage) {
         m_hp -= mDamage;
         if (m_hp <= 0) {
-            MonsterPool.Instance.ReturnToPool(this);
+            DisableMonster();
         }
     }
 

@@ -25,9 +25,10 @@ public class CannonTower : MonoBehaviour {
     private float _projectileSpeed;
     private Vector3 _interception;
     private CannonProjectile _cachedProjectile;
-    private Monster _target;
+    [SerializeField] private Monster _target;
     private bool _targetLocked;
     private float _closest = float.PositiveInfinity;
+    private float _sqrMagnitude;
 
 
     private void Awake() {
@@ -47,12 +48,8 @@ public class CannonTower : MonoBehaviour {
         if (!_initialized)
             return;
 
-        if (!_targetLocked || !_target || (_towerPosition - _target.Tf.position).sqrMagnitude > _rangeSquared)
+        if (!_targetLocked || (_towerPosition - _interception).sqrMagnitude > _rangeSquared)
             FindTarget();
-        /*else {
-            _targetLocked = false;
-            Debug.Log("target unlocked");
-        }*/
 
         if (!_targetLocked)
             return;
@@ -66,10 +63,7 @@ public class CannonTower : MonoBehaviour {
                 return;
             }
 
-            Debug.Log(
-                $"Le Dot: {Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized)}");
-
-            if (Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized) < 0.9f) {
+            if (Vector3.Dot(m_shootPoint.forward, (_interception - m_shootPoint.position).normalized) < 0.95f) {
                 _cachedProjectile = CannonProjectilePool.Instance.GetAtPoint(m_shootPoint);
                 _cachedProjectile.SetTranslation((_interception - m_shootPoint.position).normalized);
                 _shotTime = m_shootInterval;
@@ -78,17 +72,29 @@ public class CannonTower : MonoBehaviour {
     }
 
     private void FindTarget() {
+        _sqrMagnitude = 0;
+        _closest = float.MaxValue;
         foreach (Monster monster in ActiveMonstersHorde.Instance.Monsters) {
-            float sqrMagnitude = Vector3.SqrMagnitude(_towerPosition - monster.transform.position);
-            if (sqrMagnitude < _rangeSquared)
+            if (!monster.Go.activeSelf /* || monster.IsDead*/)
                 continue;
 
-            if(_closest>sqrMagnitude) {
+            _sqrMagnitude = (_towerPosition - monster.transform.position).sqrMagnitude;
+            if (_sqrMagnitude > _rangeSquared)
+                continue;
+
+
+            if (_closest > _sqrMagnitude) {
                 _target = monster;
                 _targetLocked = true;
-                _closest = sqrMagnitude;
+                _closest = _sqrMagnitude;
             }
         }
+
+        if (_target) {
+            _targetLocked = true;
+            _target.OnTargetDestroyed += delegate { _targetLocked = false; };
+        }
+        //Debug.Break();
     }
 }
 
@@ -102,13 +108,10 @@ public class CannonTurret {
         if (!_pivot)
             return;
 
-        // Get direction from this object to the target
         Vector3 direction = (targetPosition - _pivot.position).normalized;
 
-        // Create a rotation only looking toward the target
         Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
 
-        // Extract just the desired axis angle
         Vector3 targetEuler = targetRotation.eulerAngles;
         Vector3 currentEuler = _pivot.rotation.eulerAngles;
         Vector3 newEuler = currentEuler;
