@@ -3,10 +3,13 @@ using Logic.Projectiles;
 using UnityEngine;
 
 namespace General.Pooling {
-    public class GuidedProjectilePool : ProjectilePoolBase<GuidedProjectile> {
-        public static GuidedProjectilePool Instance;
-        [SerializeField] private PrefabObjectMaker<GuidedProjectile> _prefabMaker;
-        protected override IObjectMaker<GuidedProjectile> ObjectMaker => _prefabMaker;
+    public class CannonProjectileLinePool : ProjectilePoolBase<CannonProjectileLine> {
+        public static CannonProjectileLinePool Instance;
+
+        [SerializeField] private PrefabObjectMaker<CannonProjectileLine> _prefabMaker;
+
+        protected override IObjectMaker<CannonProjectileLine> ObjectMaker => _prefabMaker;
+
         protected override void Intialize() {
             if (Instance != null) {
                 Destroy(gameObject);
@@ -17,6 +20,5 @@ namespace General.Pooling {
         }
         
         public override float GetProjectileSpeed() => _prefabMaker.Prefab.Speed;
-        
     }
 }

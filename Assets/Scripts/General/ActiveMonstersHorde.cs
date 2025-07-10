@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using Logic.Monsters;
 using UnityEngine;
 
 namespace General {
+    /// <summary> Класс для отслеживания активных монстров </summary>
+    /// <info> Чтобы не обращаться к FindComponentsOfType </info>
     public class ActiveMonstersHorde : MonoBehaviour {
         public static ActiveMonstersHorde Instance;
-        public List<Monster> Monsters;// { get; private set; }
+        public List<Monster> Monsters;
 
         private void Awake() {
             if (Instance != null) {
@@ -16,7 +19,7 @@ namespace General {
             Monsters = new List<Monster>();
         }
 
-        public void Add(Monster monster) {
+        public void TryAdd(Monster monster) {
             if (!Monsters.Contains(monster)) {
                 Monsters.Add(monster);
             }
