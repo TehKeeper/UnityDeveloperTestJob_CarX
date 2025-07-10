@@ -1,10 +1,12 @@
 ﻿using General.Pooling;
+using Logic.Projectiles;
 using UnityEngine;
 
 namespace Logic.Towers {
-	public class SimpleTower : BaseTower {
+	public class SimpleTower : BaseTower<GuidedProjectile> {
 		private static readonly Vector3 V3Zero = Vector3.zero;
 		protected override Vector3 Interception => Radar.TargetLocked ? Target.Tf.position : V3Zero;
+		protected override ProjectilePoolBase<GuidedProjectile> Pool => GuidedProjectilePool.Instance;
 
 		protected override void FireProjectile() {
 			if (_shotTime + _shootInterval > Time.time)
@@ -15,14 +17,6 @@ namespace Logic.Towers {
 			_shotTime = Time.time;
 		}
 
-		protected override bool InitializationCheck() {
-			if (GuidedProjectilePool.Instance == null || _shootPoint == null) {
-				Debug.Log("Проверьте пул объектов и/или точку выстрела");
-				enabled = false;
-				return false;
-			}
-		
-			return true;
-		}
+		protected override void Initialize() { }
 	}
 }

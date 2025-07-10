@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Logic.Towers {
-    public class CannonTowerLinear : BaseTower {
+    public class CannonTowerLinear : BaseTower<CannonProjectileLine> {
         [FormerlySerializedAs("_turret")]
         [Header("Turret Parts")]
         [SerializeField] private CannonTurret _turretHor;
@@ -14,20 +14,14 @@ namespace Logic.Towers {
         private float _projectileSpeed;
         private Vector3 _interception;
         protected override Vector3 Interception => _interception;
+        
         private CannonProjectileLine _cachedProjectile;
         private bool _targetLocked;
         private Vector3 _targetPosition;
+        protected override ProjectilePoolBase<CannonProjectileLine> Pool => CannonProjectileLinePool.Instance;
 
-
-        protected override bool InitializationCheck() {
-            if (CannonProjectileLinePool.Instance == null || _shootPoint == null) {
-                Debug.Log("Проверьте пул объектов и/или точку выстрела");
-                enabled = false;
-                return false;
-            }
-
+        protected override void Initialize() {
             _projectileSpeed = CannonProjectileLinePool.Instance.GetProjectileSpeed();
-            return true;
         }
 
 

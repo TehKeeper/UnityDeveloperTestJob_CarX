@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Logic.Towers {
-    public class CannonTower : BaseTower {
+    public class CannonTower : BaseTower<CannonProjectile> {
         [FormerlySerializedAs("_turret")]
         [Header("Turret Parts")]
         [SerializeField] private CannonTurret _turretHor;
@@ -14,22 +14,15 @@ namespace Logic.Towers {
         private float _projectileSpeed;
         private Vector3 _interception;
         protected override Vector3 Interception => _interception;
+        protected override ProjectilePoolBase<CannonProjectile> Pool => CannonProjectilePool.Instance;
         private CannonProjectile _cachedProjectile;
         private bool _targetLocked;
 
 
-        protected override bool InitializationCheck() {
-            if (CannonProjectilePool.Instance == null || _shootPoint == null) {
-                Debug.Log("Проверьте пул объектов и/или точку выстрела");
-                enabled = false;
-                return false;
-            }
-
+        protected override void Initialize() {
             _projectileSpeed = CannonProjectilePool.Instance.GetProjectileSpeed();
-            return true;
         }
-
-
+        
         protected override void FireProjectile() {
             if (PreemptiveCalculator.TryCalculateInterception(_shootPoint.position, _projectileSpeed,
                     Target.Tf.position, Target.GetVelocity(), out _interception, out float time)) {

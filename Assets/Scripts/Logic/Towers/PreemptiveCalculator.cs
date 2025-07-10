@@ -54,7 +54,7 @@ namespace Logic.Towers {
                 return false;
 
             _displacement = end - start;
-            _gravityTerm = 0.5f * Physics.gravity * time * time * ((forceUpwardArc && velocity.y < 0f) ? 1 : -1);
+            _gravityTerm = 0.5f * Physics.gravity * time * time * ((forceUpwardArc && velocity.y < 0f) ? -1 : 1);
 
             velocity = (_displacement - _gravityTerm) / time;
             
