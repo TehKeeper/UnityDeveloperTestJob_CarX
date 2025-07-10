@@ -10,6 +10,10 @@ namespace Towers {
         private static float _time2;
         private static float _resultTime;
 
+        private static readonly Vector3 _v3zero = Vector3.zero;
+        private static Vector3 _displacement;
+        private static Vector3 _gravityTerm;
+
 
         public static bool TryCalculateInterception(Vector3 barrelPosition, float projectileSpeed, Vector3 targetPos,
             Vector3 targetVelocity, out Vector3 interception, out float time) {
@@ -35,35 +39,26 @@ namespace Towers {
                 return false;
             }
 
-            Debug.DrawLine(targetPos, barrelPosition, Color.red);
             interception = targetPos + targetVelocity * _resultTime;
             time = _resultTime;
 
             return true;
         }
 
-        
-        public static bool CalculateParabolicVelocity(Vector3 start, Vector3 end,  float time, out Vector3 velocity,  bool forceUpwardArc = false)
-        {
-            velocity = Vector3.zero;
 
+        public static bool CalculateParabolicVelocity(Vector3 start, Vector3 end, float time, out Vector3 velocity,
+            bool forceUpwardArc = false) {
+            velocity = _v3zero;
 
             if (time <= 0f)
                 return false;
 
-            Vector3 displacement = end - start;
-            Vector3 gravityTerm = 0.5f * Physics.gravity * time * time;
+            _displacement = end - start;
+            _gravityTerm = 0.5f * Physics.gravity * time * time * ((forceUpwardArc && velocity.y < 0f) ? 1 : -1);
 
-            velocity = (displacement - gravityTerm) / time;
-
-            if (forceUpwardArc && velocity.y < 0f)
-            {
-                velocity = (displacement + gravityTerm) / time;
-            }
+            velocity = (_displacement - _gravityTerm) / time;
             
-
             return true;
         }
-        
     }
 }
