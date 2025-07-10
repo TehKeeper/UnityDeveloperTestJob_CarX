@@ -1,33 +1,26 @@
-﻿using General;
-using General.Pooling;
+﻿using General.Pooling;
+using Logic.Towers;
 using UnityEngine;
 
-public class SimpleTower : MonoBehaviour {
-	[SerializeField] private Transform m_barrel;
-	
-	public float m_shootInterval = 0.5f;
-	public float m_range = 4f;
-	public GameObject m_projectilePrefab;
+public class SimpleTower : BaseTower {
+	protected override Vector3 Interception => Target.Tf.position;
 
-	private float m_lastShotTime = -0.5f;
-	
-	void Update () {
-		if (m_projectilePrefab == null)
+	protected override void FireProjectile() {
+		if (_shotTime + m_shootInterval > Time.time)
 			return;
+		
+		GuidedProjectilePool.Instance.GetAtPoint(m_shootPoint).m_target = Target.Tf;
 
-		foreach (var monster in FindObjectsOfType<Monster>()) {
-			if (Vector3.Distance (transform.position, monster.transform.position) > m_range)
-				continue;
+		_shotTime = Time.time;
+	}
 
-			if (m_lastShotTime + m_shootInterval > Time.time)
-				continue;
-
-			// shot
-			GuidedProjectile projectileBeh = GuidedProjectilePool.Instance.GetAtPoint(m_barrel);
-			projectileBeh.m_target = monster.Tf;
-
-			m_lastShotTime = Time.time;
+	protected override bool InitializationCheck() {
+		if (GuidedProjectilePool.Instance == null || m_shootPoint == null) {
+			Debug.Log("Проверьте пул объектов и/или точку выстрела");
+			enabled = false;
+			return false;
 		}
-	
+		
+		return true;
 	}
 }
