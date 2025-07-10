@@ -28,8 +28,8 @@ namespace General.Pooling {
             ActiveMonstersHorde.Instance.TryRemove(item);
             item.Go.SetActive(false);
 
-            item.Tf.position = PhysicalStorage.position;
-            item.Tf.parent = PhysicalStorage;
+            item.Tf.position = _physicalStorage.position;
+            item.Tf.parent = _physicalStorage;
         }
     }
 }

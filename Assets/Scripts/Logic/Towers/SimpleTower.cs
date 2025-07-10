@@ -12,7 +12,7 @@ namespace Logic.Towers {
 			if (_shotTime + _shootInterval > Time.time)
 				return;
 		
-			GuidedProjectilePool.Instance.GetAtPoint(_shootPoint).SetTarget(Target.Tf);
+			GuidedProjectilePool.Instance.GetAtPoint(_shootPoint).SetTarget(Target);
 
 			_shotTime = Time.time;
 		}

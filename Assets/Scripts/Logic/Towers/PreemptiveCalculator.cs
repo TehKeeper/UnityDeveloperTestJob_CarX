@@ -14,13 +14,19 @@ namespace Logic.Towers {
         private static Vector3 _displacement;
         private static Vector3 _gravityTerm;
 
-
-        public static bool TryCalculateInterception(Vector3 barrelPosition, float projectileSpeed, Vector3 targetPos,
+        /// <summary> Высчитывает точку пересечения снаряда с целью </summary>
+        /// <param name="barrelPosition">Стартовая позиция снаряда</param>
+        /// <param name="projectileSpeed">Скорость снаряда</param>
+        /// <param name="targetPosition">Позиция цели</param>
+        /// <param name="targetVelocity">Скорость перемещения цели</param>
+        /// <param name="interception">Точка пересечения</param>
+        /// <param name="time">Время до пересечения</param>
+        public static bool TryCalculateInterception(Vector3 barrelPosition, float projectileSpeed, Vector3 targetPosition,
             Vector3 targetVelocity, out Vector3 interception, out float time) {
-            _pathToTarget = targetPos - barrelPosition;
-            time = 0;
+            _pathToTarget = targetPosition - barrelPosition;
+            time = -1;
 
-            interception = targetPos;
+            interception = targetPosition;
             _a = targetVelocity.sqrMagnitude - projectileSpeed * projectileSpeed;
             _b = 2f * Vector3.Dot(_pathToTarget, targetVelocity);
 
@@ -39,7 +45,7 @@ namespace Logic.Towers {
                 return false;
             }
 
-            interception = targetPos + targetVelocity * _resultTime;
+            interception = targetPosition + targetVelocity * _resultTime;
             time = _resultTime;
 
             return true;
@@ -57,7 +63,7 @@ namespace Logic.Towers {
             _gravityTerm = 0.5f * Physics.gravity * time * time * ((forceUpwardArc && velocity.y < 0f) ? -1 : 1);
 
             velocity = (_displacement - _gravityTerm) / time;
-            
+
             return true;
         }
     }

@@ -20,7 +20,7 @@ namespace Logic.Towers {
 
 
         protected override void Initialize() {
-            _projectileSpeed = CannonProjectilePool.Instance.GetProjectileSpeed();
+            _projectileSpeed = Pool.GetProjectileSpeed();
         }
         
         protected override void FireProjectile() {

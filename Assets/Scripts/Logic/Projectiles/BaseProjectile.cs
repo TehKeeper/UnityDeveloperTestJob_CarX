@@ -2,6 +2,7 @@
 using UnityEngine;
 
 namespace Logic.Projectiles {
+    /// <summary> Базовый класс снаряда </summary>
     public abstract class BaseProjectile : MonoBehaviour {
         [SerializeField] protected float m_speed = 0.2f;
         [SerializeField] protected int m_damage = 10;
@@ -12,7 +13,7 @@ namespace Logic.Projectiles {
         /// <summary> gameObject </summary>
         /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
         public GameObject Go { get; private set; }
-    
+
         /// <summary> transform </summary>
         /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
         public Transform Tf { get; private set; }
@@ -25,6 +26,7 @@ namespace Logic.Projectiles {
             Initialize();
         }
 
+        /// <summary> Инициализация в Awake </summary>
         protected virtual void Initialize() {
         }
 
@@ -39,12 +41,14 @@ namespace Logic.Projectiles {
         }
 
         private void OnTriggerEnter(Collider other) {
-            if (other.TryGetComponent<Monster>(out Monster monster)) {
+            if (other.TryGetComponent(out Monster monster)) {
+                //как вариант - можно, конечно, использовать тэг. Но в любом случае придётся обращаться к компоненту
                 monster.ApplyDamage(m_damage);
                 ReturnToPool();
             }
         }
 
+        /// <summary> Процесс возвращения в пул </summary>
         protected abstract void ReturnToPool();
     }
 }

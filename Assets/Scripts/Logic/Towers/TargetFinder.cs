@@ -52,6 +52,9 @@ namespace Logic.Towers {
             return false;
             //Debug.Break();
         }
+        /// <summary> Проверяет валидность цели - что она существует, не уничетожена и в радиусе поражения </summary>
+        /// <param name="target"></param>
+        /// <param name="interceptionPoint">Используется для определения радиуса поражения. Если точка пересечения вышла за радиус - то цель невалидна</param>
 
         public bool IsValidTarget(Monster target, Vector3 interceptionPoint) {
             return _targetLocked && (_towerPosition - interceptionPoint).sqrMagnitude < _rangeSquared &&

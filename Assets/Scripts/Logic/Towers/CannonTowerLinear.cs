@@ -21,7 +21,7 @@ namespace Logic.Towers {
         protected override ProjectilePoolBase<CannonProjectileLine> Pool => CannonProjectileLinePool.Instance;
 
         protected override void Initialize() {
-            _projectileSpeed = CannonProjectileLinePool.Instance.GetProjectileSpeed();
+            _projectileSpeed = Pool.GetProjectileSpeed();
         }
 
 

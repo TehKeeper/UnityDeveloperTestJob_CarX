@@ -2,21 +2,23 @@
 using General;
 using General.Pooling;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Logic.Monsters {
     public class Monster : MonoBehaviour {
-        public float m_speed = 2f;
-        public int m_maxHP = 30;
+        private const float SPEED = 2f;
+        private const int MAX_HP = 30;
+        private const float REACH_DISTANCE_SQUARED = 3f;
         public event Action OnTargetDestroyed;
 
-        public int m_hp;
+        private int _hp;
 
-        private float _reachDistanceSquared;
 
-        private Vector3 m_moveTarget;
+        private Vector3 _moveTarget;
         private Vector3 _translation;
+        private bool _targetSet;
 
-        private const float m_reachDistance = 0.5477f;
+
         public bool IsDead { get; private set; }
 
         /// <summary> gameObject </summary>
@@ -27,24 +29,24 @@ namespace Logic.Monsters {
         /// <info>Сокращено чтобы не пересекалось с наименованием класса</info>
         public Transform Tf { get; private set; }
 
+        public Vector3 GetVelocity() => _translation * SPEED;
+
         private void Awake() {
             Tf = transform;
             Go = gameObject;
-            _reachDistanceSquared = m_reachDistance * m_reachDistance;
         }
 
         void OnEnable() {
             IsDead = false;
-            m_hp = m_maxHP;
-            ActiveMonstersHorde.Instance.Add(this);
+            _hp = MAX_HP;
+            ActiveMonstersHorde.Instance.TryAdd(this);
         }
 
         void Update() {
-            /*if (m_moveTarget == null)
-            return;*/
+            if (IsDead || !_targetSet)
+                return;
 
-
-            if ((Tf.position - m_moveTarget).sqrMagnitude <= _reachDistanceSquared) {
+            if ((Tf.position - _moveTarget).sqrMagnitude <= REACH_DISTANCE_SQUARED) {
                 DisableMonster();
                 return;
             }
@@ -54,29 +56,29 @@ namespace Logic.Monsters {
 
         private void DisableMonster() {
             IsDead = true;
-        
+            _targetSet = false;
             MonsterPool.Instance.ReturnToPool(this);
             OnTargetDestroyed?.Invoke();
             OnTargetDestroyed = null;
         }
 
         public void ApplyDamage(int mDamage) {
-            m_hp -= mDamage;
-            if (m_hp <= 0) {
+            _hp -= mDamage;
+            if (_hp <= 0) {
                 DisableMonster();
             }
         }
 
         public void SetTargetPosition(Vector3 target) {
-            m_moveTarget = target;
-            _translation = (m_moveTarget - Tf.position).normalized * m_speed;
+            _moveTarget = target;
+            _translation = (_moveTarget - Tf.position).normalized * SPEED;
+            _targetSet = true;
         }
 
-        public Vector3 GetVelocity() => _translation * m_speed;
 
-        private void OnDrawGizmos() {
-            Gizmos.color = new Color(0.9f, 0.4f, 0.0f, 0.5f);
-            Gizmos.DrawSphere(Tf.position, 0.2f);
+        private void OnDestroy() {
+            OnTargetDestroyed?.Invoke();
+            OnTargetDestroyed = null;
         }
     }
 }

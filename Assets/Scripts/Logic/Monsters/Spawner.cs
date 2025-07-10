@@ -1,31 +1,31 @@
 ﻿using General.Pooling;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Logic.Monsters {
-	public class Spawner : MonoBehaviour {
-		[SerializeField] private float m_interval = 3;
-		[SerializeField] private Transform m_moveTarget;
+    public class Spawner : MonoBehaviour {
+        [FormerlySerializedAs("m_interval")] [SerializeField] private float _spawnInterval = 3;
+        [FormerlySerializedAs("m_moveTarget")] [SerializeField] private Transform _moveTarget;
 
-		private float m_lastSpawn = 3;
-		private Transform _transform;
+        private float _lastSpawn = 0;
+        private Transform _transform;
 
-		private Monster _cachedMonster;
+        private Monster _cachedMonster;
 
-		private void Awake() {
-			_transform = transform;
-			m_lastSpawn = 0;
-		}
+        private void Awake() {
+            _transform = transform;
+        }
 
-		void Update () {
-			if (m_lastSpawn >= 0) {
-				m_lastSpawn -= Time.deltaTime;
-				return;
-			}
-		
-			_cachedMonster = MonsterPool.Instance.GetAtPoint(_transform);
-			_cachedMonster.SetTargetPosition(m_moveTarget.position);
+        void Update() {
+            if (_lastSpawn >= 0) {
+                _lastSpawn -= Time.deltaTime;
+                return;
+            }
 
-			m_lastSpawn = m_interval;
-		}
-	}
+            _cachedMonster = MonsterPool.Instance.GetAtPoint(_transform);
+            _cachedMonster.SetTargetPosition(_moveTarget.position);
+
+            _lastSpawn = _spawnInterval;
+        }
+    }
 }

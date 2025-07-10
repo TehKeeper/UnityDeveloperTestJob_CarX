@@ -2,14 +2,12 @@
 using UnityEngine;
 
 namespace Logic.Towers {
-    /// <summary>
-    /// Вращает элементы турели
-    /// </summary>
+    /// <summary> Вращает элементы турели </summary>
     [Serializable]
     public class CannonTurret {
         [SerializeField] private Transform _pivot;
         [SerializeField] float _rotationSpeed = 1;
-        
+        //Тут можно сразу, конечно вставить ограничение по оси, но это потом как-нибудь
         
         private Quaternion _cachedTargetRotation;
         private Vector3 _targetAngles;

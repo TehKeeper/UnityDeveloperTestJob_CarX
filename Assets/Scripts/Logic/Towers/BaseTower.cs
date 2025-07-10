@@ -4,6 +4,8 @@ using Logic.Projectiles;
 using UnityEngine;
 
 namespace Logic.Towers {
+    /// <summary> Базовый класс для башень </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class BaseTower<T> : MonoBehaviour where T : BaseProjectile {
         [Header("Tower stats")]
         [SerializeField] protected float _shootInterval = 0.5f;
@@ -15,12 +17,16 @@ namespace Logic.Towers {
         [SerializeField] protected float _shotTime;
 
         protected TargetFinder Radar;
-        private bool _initialized;
-
+        
         protected Monster Target;
+        /// <summary> Точка пересечения снаряда и цели </summary>
+        /// <info> Если снаряд самонаводящийся - можно использовать Target в качестве возвращаемого значения </info>
         protected abstract Vector3 Interception { get; }
 
+        /// <summary> Пул Снарядов </summary>
         protected abstract ProjectilePoolBase<T> Pool { get; }
+        
+        private bool _initialized;
 
         private void Awake() {
             Radar = new TargetFinder(transform.position, _range * _range);
@@ -43,7 +49,7 @@ namespace Logic.Towers {
 
             FireProjectile();
         }
-
+        
         private bool SearchTarget() {
             if (!Radar.IsValidTarget(Target, Interception)) {
                 Radar.FindTarget(ref Target);
@@ -52,11 +58,13 @@ namespace Logic.Towers {
             return Radar.TargetLocked;
         }
 
+        /// <summary> Процесс стрельбы </summary>
         protected abstract void FireProjectile();
 
-        /// <summary> Инициализация класса на Awake </summary>
+        /// <summary> Инициализация класса в Awake </summary>
         protected abstract void Initialize();
 
+        /// <summary> Проверка наличия пула снарядов и точки ствола </summary>
         private bool PoolAndPointCheck() {
             if (Pool == null) {
                 Debug.Log("Проверьте пул объектов");
