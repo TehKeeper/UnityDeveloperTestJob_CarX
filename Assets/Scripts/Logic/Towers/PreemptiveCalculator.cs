@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Towers {
+namespace Logic.Towers {
     public static class PreemptiveCalculator {
         private static float _a;
         private static float _b;

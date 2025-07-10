@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using General.Pooling.Makers;
 using UnityEngine;
 
 namespace General.Pooling {
@@ -44,44 +44,4 @@ namespace General.Pooling {
 
         protected abstract void DisableItem(T item);
     }
-
-    public interface IObjectMaker<T> where T : UnityEngine.Component {
-        public T Make();
-
-        public T MakeAtPoint(Transform point);
-    }
-
-    [Serializable]
-    public class PrefabObjectMaker<T> : IObjectMaker<T> where T : UnityEngine.Component {
-        [SerializeField] private T m_prefab;
-        public T Prefab => m_prefab;
-
-        public T Make() => UnityEngine.GameObject.Instantiate(m_prefab);
-
-        public T MakeAtPoint(Transform point) =>
-            UnityEngine.GameObject.Instantiate(m_prefab, point.position, point.rotation);
-    }
-
-    [Serializable]
-    public class CapsuleObjectMaker<T> : IObjectMaker<T> where T : UnityEngine.Component {
-        private int _index = 0;
-        public T Make() {
-            GameObject newItem = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            newItem.name = $"{newItem.name}_{_index++}";
-            Rigidbody itemRigidBody = newItem.AddComponent<Rigidbody>();
-            itemRigidBody.useGravity = false;
-            T componenet = newItem.AddComponent<T>();
-
-            return componenet;
-        }
-
-        public T MakeAtPoint(Transform point) {
-            T item = Make();
-            item.transform.position = point.position;
-
-            return item;
-        }
-    }
-
-    
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Logic.Monsters;
 using UnityEngine;
 
 namespace General {

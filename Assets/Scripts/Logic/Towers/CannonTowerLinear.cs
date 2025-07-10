@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Logic.Towers {
-    public class CannonTower : BaseTower {
+    public class CannonTowerLinear : BaseTower {
         [FormerlySerializedAs("_turret")]
         [Header("Turret Parts")]
         [SerializeField] private CannonTurret _turretHor;
@@ -14,18 +14,19 @@ namespace Logic.Towers {
         private float _projectileSpeed;
         private Vector3 _interception;
         protected override Vector3 Interception => _interception;
-        private CannonProjectile _cachedProjectile;
+        private CannonProjectileLine _cachedProjectile;
         private bool _targetLocked;
+        private Vector3 _targetPosition;
 
 
         protected override bool InitializationCheck() {
-            if (CannonProjectilePool.Instance == null || _shootPoint == null) {
+            if (CannonProjectileLinePool.Instance == null || _shootPoint == null) {
                 Debug.Log("Проверьте пул объектов и/или точку выстрела");
                 enabled = false;
                 return false;
             }
 
-            _projectileSpeed = CannonProjectilePool.Instance.GetProjectileSpeed();
+            _projectileSpeed = CannonProjectileLinePool.Instance.GetProjectileSpeed();
             return true;
         }
 
@@ -34,22 +35,17 @@ namespace Logic.Towers {
             if (PreemptiveCalculator.TryCalculateInterception(_shootPoint.position, _projectileSpeed,
                     Target.Tf.position, Target.GetVelocity(), out _interception, out float time)) {
                 _turretHor.RotateToTarget(_interception, RotationAxis.Y);
+                _turretVert.RotateToTarget(_interception, RotationAxis.X);
 
-
-                if (PreemptiveCalculator.CalculateParabolicVelocity(_shootPoint.position, _interception, time * 2f,
-                        out Vector3 velocity, false)) {
-                    _turretVert.RotateToDirection(velocity, RotationAxis.X);
-
-                    if (_shotTime > 0) {
-                        _shotTime -= Time.deltaTime;
-                        return;
-                    }
-
-
-                    _cachedProjectile = CannonProjectilePool.Instance.GetAtPoint(_shootPoint);
-                    _cachedProjectile.Launch(velocity);
-                    _shotTime = _shootInterval;
+                if (_shotTime > 0) {
+                    _shotTime -= Time.deltaTime;
+                    return;
                 }
+
+
+                _cachedProjectile = CannonProjectileLinePool.Instance.GetAtPoint(_shootPoint);
+                _cachedProjectile.SetTranslation((_interception - _shootPoint.position).normalized);
+                _shotTime = _shootInterval;
             }
         }
     }

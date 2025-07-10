@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using General.Pooling.Makers;
+using Logic.Monsters;
+using UnityEngine;
 
 namespace General.Pooling {
     public class MonsterPool : ObjectPoolGeneric<Monster> {
